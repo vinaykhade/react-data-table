@@ -1,0 +1,28 @@
+.rc-dt-container {
+    overflow: auto;
+    min-height: 90px;
+    max-height: 370px;
+}
+
+.rc-dt-table {
+    display: table;
+    width: 100%;
+    /* table-layout: fixed; */
+}
+
+.rc-dt-body {
+    display: table-row-group;
+}
+
+.rc-dt-row {
+    display: table-row;
+}
+
+.rc-dt-column {
+    position: relative;
+    display: table-cell;
+    background-color: #fff;
+    padding: 8px 15px;
+    font-size: 12px;
+    line-height: 14px;
+}
