@@ -24,16 +24,21 @@
   },
   "homepage": "https://github.com/vinaykhade/react-data-table#readme",
   "dependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-es2016": "^6.24.1",
     "react": "^16.4.0",
+    "react-dom": "^16.8.1",
     "webpack": "^4.12.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
     "css-loader": "^2.1.0",
     "style-loader": "^0.23.1",
     "webpack-cli": "^3.0.4"
