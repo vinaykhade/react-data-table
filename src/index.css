@@ -30,6 +30,7 @@
     width: 100%;
     position: sticky;
     top: 0;
+    z-index: 99;
 }
 
 .rc-dt-header-column {
@@ -48,6 +49,9 @@
     background: #fafafa;
     border-right: 1px solid  #eee;
     text-align: left;
+    position: sticky;
+    top: 31px;
+    z-index: 99;
 }
 
 .rc-dt-column {
@@ -60,7 +64,7 @@
     border: 1px solid #eee;
     border-left: none;
     border-right: none;
-    border-bottom: none;
+    border-top: none;
 }
 
 .rc-column {
