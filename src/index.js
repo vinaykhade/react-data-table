@@ -40,7 +40,7 @@ class ReactDataTable extends React.Component {
         
         const headerColList = document.getElementsByClassName('rc-header-column');
 
-        const diff =  (tableHeaderRow.length)*(20);     
+        const diff =  (tableHeaderRow.length)*(50);     
 
         if(tableContainerWidth > sumOfMinWidthOfColumns) {    
             tableEle.style.width = `${Math.round(tableContainerWidth)}px`; 
@@ -78,7 +78,7 @@ class ReactDataTable extends React.Component {
                 } else {
                     const colMinWidth = headerCol.querySelector('.rc-column-content .header-label')
                                                   .getBoundingClientRect().width
-                                                  + 20
+                                                  + 50
                                                   + 30;               
                     headerCol.setAttribute('min-width', `${colMinWidth}px`);
                     headerCol.style.width = `${Math.round(colMinWidth)}px`;
@@ -140,13 +140,7 @@ class ReactDataTable extends React.Component {
                     }       
                 </div>
                 <div className="rc-dt-table">
-                    <div className="rc-dt-body">
-                        {/* TODO: Work on header groups */}
-                                                
-                        
-                        
-                       
-                        
+                    <div className="rc-dt-body">        
                         <div className="rc-dt-header-row rc-dt-row">
                             {
                                 columns.map((headerCol, headerKey) => 
