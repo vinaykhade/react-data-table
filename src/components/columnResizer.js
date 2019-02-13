@@ -73,7 +73,9 @@ const onMouseDown = e => {
 };
 
 const ColumnResizer = () => {
-  <div onMouseDown={e => onMouseDown(e)} className="rc-column-resizer" />;
+  return (
+    <div onMouseDown={e => onMouseDown(e)} className="rc-column-resizer" />
+  );
 };
 
 export default ColumnResizer;
