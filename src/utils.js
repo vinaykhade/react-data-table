@@ -29,17 +29,26 @@ const utils = (() => {
   ) => {
     if (tableContainerWidth > sumOfMinWidthOfColumns) {
       const netWidthDiff = tableContainerWidth - sumOfMinWidthOfColumns;
-      const defaultColsDiff = tableHeaderRow.length;
+      const defaultColsDiff = [...tableHeaderRow].filter(
+        headerCol => !headerCol.getAttribute('data-customwidth')
+      ).length;
       const extraPerColumnWidth = netWidthDiff / defaultColsDiff;
-      const colMinWidth =
-        headerCol
-          .querySelector('.rc-column-content .header-label')
-          .getBoundingClientRect().width +
-        50 +
-        30 +
-        extraPerColumnWidth;
 
-      // eslint-disable-next-line rule-name no-param-reassign
+      const customWidth = headerCol.getAttribute('data-customwidth');
+
+      let colMinWidth = 0;
+      if (customWidth) {
+        colMinWidth = parseFloat(customWidth);
+      } else {
+        colMinWidth =
+          headerCol
+            .querySelector('.rc-column-content .header-label')
+            .getBoundingClientRect().width +
+          50 +
+          30 +
+          extraPerColumnWidth;
+      }
+
       headerCol.setAttribute('min-width', `${colMinWidth}px`);
       headerCol.style.width = `${Math.round(colMinWidth)}px`;
 
@@ -52,19 +61,30 @@ const utils = (() => {
         sumOfColumnWidths
       );
     } else {
-      const colMinWidth =
-        headerCol
-          .querySelector('.rc-column-content .header-label')
-          .getBoundingClientRect().width +
-        50 +
-        30;
+      const customWidth = headerCol.getAttribute('data-customwidth');
+      let colMinWidth = 0;
+      if (customWidth) {
+        colMinWidth = parseFloat(customWidth);
+      } else {
+        colMinWidth =
+          headerCol
+            .querySelector('.rc-column-content .header-label')
+            .getBoundingClientRect().width +
+          50 +
+          30;
+      }
+
       headerCol.setAttribute('min-width', `${colMinWidth}px`);
       headerCol.style.width = `${Math.round(colMinWidth)}px`;
 
       const headerGroupId = headerCol.getAttribute('data-parentheaderid');
       getGroupHeaderWidthMap(headerGroupId, colMinWidth);
 
-      const extraWidth = tableHeaderRow.length * 50;
+      const extraWidth =
+        [...tableHeaderRow].filter(
+          headerCol => !headerCol.getAttribute('data-customwidth')
+        ).length * 50;
+
       setTableRowsWidth(
         [tableEle, tableGroupHeaderRow, headerRow],
         sumOfMinWidthOfColumns + extraWidth
@@ -85,11 +105,16 @@ const utils = (() => {
 
     let sumOfMinWidthOfColumns = 0;
     [...tableHeaderRow].forEach(col => {
-      const colMinWidth =
-        col
-          .querySelector('.rc-column-content .header-label')
-          .getBoundingClientRect().width + 30;
-      sumOfMinWidthOfColumns += Math.round(colMinWidth);
+      const customWidth = col.getAttribute('data-customwidth');
+      if (customWidth) {
+        sumOfMinWidthOfColumns += Math.round(customWidth);
+      } else {
+        const colMinWidth =
+          col
+            .querySelector('.rc-column-content .header-label')
+            .getBoundingClientRect().width + 30;
+        sumOfMinWidthOfColumns += Math.round(colMinWidth);
+      }
     });
 
     if (tableHeaderRow.length > 0) {

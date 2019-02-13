@@ -10,6 +10,7 @@ class TableHeader extends React.Component {
           headerCol.columns.map((column, key) => (
             <div
               key={key}
+              data-customwidth={column.width ? column.width : null}
               data-parentheaderid={`${headerCol.Header}-${headerKey}`}
               className="rc-dt-column rc-column rc-header-column"
             >
