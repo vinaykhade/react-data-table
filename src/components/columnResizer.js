@@ -48,12 +48,8 @@ const resizeColumnMoving = (event) => {
     let pageX = event.pageX;
 
     const widthDiff = pageX - currentlyResizing.startX;
-
-    const tableContainerWidth = document.getElementsByClassName('rc-dt-container')[0]
-                                        .getBoundingClientRect().width;
     
     const headerGroupRow = document.getElementsByClassName('rc-dt-headergroup-row')[0];
-    let headerGroupRowWidth = headerGroupRow.getBoundingClientRect().width;
 
     const tableEleNewWidth = currentlyResizing.tableWidth + widthDiff;
     const headerEleNewWidth = currentlyResizing.columnHeaderWidth + widthDiff;  
@@ -65,7 +61,6 @@ const resizeColumnMoving = (event) => {
     currentlyResizing.tableEle.style.width = `${tableEleNewWidth}px`;
 
     headerGroupRow.style.width = `${tableEleNewWidth}px`;
-    console.log("widthDiff", widthDiff)
 }
 
 const resizeColumnEnd = (event) => {
