@@ -1,5 +1,77 @@
 const utils = (() => {
 
+    let sumOfColumnWidths = 0;
+    let headerGroupWidthMap = {};
+
+    const setTableRowsWidth = (tableElements, width) => {
+        [...tableElements].forEach(tableEle => {
+            tableEle.style.width = `${Math.round(width)}px`;
+        })
+    };
+
+    const getGroupHeaderWidthMap = (
+        headerGroupId, 
+        colMinWidth
+    ) => {
+        if(headerGroupWidthMap[headerGroupId]) {
+            const previousWidth = headerGroupWidthMap[headerGroupId];
+            const newWidth = previousWidth + colMinWidth;
+            headerGroupWidthMap[headerGroupId] = Math.round(newWidth);
+        } else {
+            headerGroupWidthMap[headerGroupId] = Math.round(colMinWidth);
+        }
+    };
+
+
+    const setTableColumnsAndRowsWidth = (
+        headerCol, 
+        tableContainerWidth,
+        sumOfMinWidthOfColumns,
+        tableHeaderRow,
+        tableEle,
+        tableGroupHeaderRow,
+        headerRow
+    ) => {
+        if(tableContainerWidth > sumOfMinWidthOfColumns) {
+            const netWidthDiff = (tableContainerWidth - sumOfMinWidthOfColumns);
+            const defaultColsDiff = (tableHeaderRow.length);
+            const extraPerColumnWidth = netWidthDiff/(defaultColsDiff);
+            const colMinWidth = headerCol.querySelector('.rc-column-content .header-label')
+                                            .getBoundingClientRect().width
+                                            + 50
+                                            + 30
+                                            + extraPerColumnWidth;                
+
+            headerCol.setAttribute('min-width', `${colMinWidth}px`);
+            headerCol.style.width = `${Math.round(colMinWidth)}px`;
+
+            const headerGroupId = headerCol.getAttribute('data-parentheaderid');
+            getGroupHeaderWidthMap(headerGroupId, colMinWidth);
+        
+            sumOfColumnWidths = sumOfColumnWidths + Math.round(colMinWidth);
+            setTableRowsWidth(
+                [tableEle,tableGroupHeaderRow,headerRow],   
+                sumOfColumnWidths
+            );
+        } else {
+            const colMinWidth = headerCol.querySelector('.rc-column-content .header-label')
+                                                .getBoundingClientRect().width
+                                                + 50
+                                                + 30;               
+            headerCol.setAttribute('min-width', `${colMinWidth}px`);
+            headerCol.style.width = `${Math.round(colMinWidth)}px`;
+            
+            const headerGroupId = headerCol.getAttribute('data-parentheaderid');
+            getGroupHeaderWidthMap(headerGroupId, colMinWidth);
+
+            const extraWidth =  (tableHeaderRow.length)*(50);  
+            setTableRowsWidth(
+                [tableEle,tableGroupHeaderRow,headerRow],   
+                sumOfMinWidthOfColumns + extraWidth
+            );
+        }
+    };
+
     const arrangeColumnWidths = () => {
         const tableGroupHeaderRow = document.getElementsByClassName('rc-dt-headergroup-row')[0];
         const tableHeaderRow =  document.getElementsByClassName('rc-header-column');
@@ -15,76 +87,37 @@ const utils = (() => {
                                             + 30;                                               
             sumOfMinWidthOfColumns += Math.round(colMinWidth);                         
         });
-        
-        const headerColList = document.getElementsByClassName('rc-header-column');
-
-        const diff =  (tableHeaderRow.length)*(50);     
-
-        if(tableContainerWidth > sumOfMinWidthOfColumns) {    
-            tableEle.style.width = `${Math.round(tableContainerWidth)}px`; 
-            tableGroupHeaderRow.style.width = `${Math.round(tableContainerWidth)}px`; 
-            headerRow.style.width = `${Math.round(tableContainerWidth)}px`; 
-        } else  {
-            tableEle.style.width = `${Math.round(sumOfMinWidthOfColumns + diff)}px`; 
-            tableGroupHeaderRow.style.width = `${Math.round(sumOfMinWidthOfColumns + diff)}px`; 
-            headerRow.style.width = `${Math.round(sumOfMinWidthOfColumns + diff)}px`;     
-        }  
-
-        
-
-        let headerGroupWidthMap = {};
-        if(headerColList.length > 0) {
-            [...headerColList].forEach((headerCol) => {
-                if(tableContainerWidth >= sumOfMinWidthOfColumns) {
-                    const netWidthDiff = (tableContainerWidth - sumOfMinWidthOfColumns);
-                    const defaultColsDiff = (headerColList.length);
-                    const extraPerColumnWidth = netWidthDiff/(defaultColsDiff);
-                    const colMinWidth = headerCol.querySelector('.rc-column-content .header-label')
-                                                  .getBoundingClientRect().width
-                                                  + 30
-                                                  + extraPerColumnWidth;                     
-                    headerCol.setAttribute('min-width', `${colMinWidth}px`);
-                    headerCol.style.width = `${Math.round(colMinWidth)}px`;
-                    const headerGroupId = headerCol.getAttribute('data-parentheaderid');
-                    if(headerGroupWidthMap[headerGroupId]) {
-                        const previousWidth = headerGroupWidthMap[headerGroupId];
-                        const newWidth = previousWidth + colMinWidth;
-                        headerGroupWidthMap[headerGroupId] = Math.round(newWidth);
-                    } else {
-                        headerGroupWidthMap[headerGroupId] = Math.round(colMinWidth);
-                    }
-                } else {
-                    const colMinWidth = headerCol.querySelector('.rc-column-content .header-label')
-                                                  .getBoundingClientRect().width
-                                                  + 50
-                                                  + 30;               
-                    headerCol.setAttribute('min-width', `${colMinWidth}px`);
-                    headerCol.style.width = `${Math.round(colMinWidth)}px`;
-                    
-                    const headerGroupId = headerCol.getAttribute('data-parentheaderid');
-                    if(headerGroupWidthMap[headerGroupId]) {
-                        const previousWidth = headerGroupWidthMap[headerGroupId];
-                        const newWidth = previousWidth + colMinWidth;
-                        headerGroupWidthMap[headerGroupId] = Math.round(newWidth)
-                    } else {
-                        headerGroupWidthMap[headerGroupId] = Math.round(colMinWidth);
-                    }
-                }   
+                
+        if(tableHeaderRow.length > 0) {  
+            [...tableHeaderRow].forEach((headerCol) => {
+                setTableColumnsAndRowsWidth(
+                    headerCol, 
+                    tableContainerWidth,
+                    sumOfMinWidthOfColumns,
+                    tableHeaderRow,
+                    tableEle,
+                    tableGroupHeaderRow,
+                    headerRow
+                );
             });
-
+            
             const groupHeaderColList = document.getElementsByClassName('rc-dt-header-column');
             [...groupHeaderColList].forEach(headerGroup => {
                 const headerGroupId = headerGroup.getAttribute('data-headergroupid');
                 const headerGroupWidth = headerGroupWidthMap[headerGroupId];
-                headerGroup.style.width = `${headerGroupWidth}px`;
+                setTableRowsWidth([headerGroup], headerGroupWidth);
             });
+
+            /* Reset values to initial after looping */
+            sumOfColumnWidths = 0;
+            headerGroupWidthMap = {};
         }
-    }
+    };
 
     return {
         arrangeColumnWidths,
-    }
-    
+    };
+
 })();
 
 export default utils;
