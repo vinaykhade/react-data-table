@@ -1,82 +1,81 @@
-import React from "react";
+import React from 'react';
 
+let isResizing = false;
+let currentlyResizing = {};
 
-let isResizing = false,
-    currentlyResizing= {};
+const resizeColumnMoving = e => {
+  e.stopPropagation();
 
-const onMouseDown = (e) => {
-    event.stopPropagation();
+  if (!isResizing) return;
 
-    const headerEle = event.target.parentElement;
-    const columnHeaderWidth = headerEle.getBoundingClientRect().width;
-    
-    const tableEle = document.getElementsByClassName('rc-dt-table')[0]
-    const tableWidth = tableEle.getBoundingClientRect().width;
+  const { pageX } = e;
 
-    const headerGroupId = headerEle.getAttribute('data-parentheaderid');
-    const groupHeaderEle = [...document.querySelectorAll('[data-headergroupid]')]
-                           .find((headerGroup) => 
-                                headerGroup
-                                .getAttribute('data-headergroupid') === headerGroupId)   
-    const groupHeaderWidth = groupHeaderEle.getBoundingClientRect().width;
+  const widthDiff = pageX - currentlyResizing.startX;
 
+  const headerGroupRow = document.getElementsByClassName(
+    'rc-dt-headergroup-row'
+  )[0];
 
+  const tableEleNewWidth = currentlyResizing.tableWidth + widthDiff;
+  const headerEleNewWidth = currentlyResizing.columnHeaderWidth + widthDiff;
+  const headerGroupNewWidth = currentlyResizing.groupHeaderWidth + widthDiff;
 
-    isResizing = true;
-    let startX = e.pageX;
+  currentlyResizing.headerEle.style.width = `${headerEleNewWidth}px`;
+  currentlyResizing.groupHeaderEle.style.width = `${headerGroupNewWidth}px`;
+  currentlyResizing.tableEle.style.width = `${tableEleNewWidth}px`;
 
-    currentlyResizing = {
-        startX,
-        headerEle,
-        groupHeaderEle,
-        tableEle,  
-        columnHeaderWidth,
-        groupHeaderWidth,
-        tableWidth
-    };
+  headerGroupRow.style.width = `${tableEleNewWidth}px`;
+};
 
-    document.addEventListener('mousemove', resizeColumnMoving);
-    document.addEventListener('mouseup', resizeColumnEnd);
-    document.addEventListener('mouseleave', resizeColumnEnd);                                                      
-}
+const resizeColumnEnd = e => {
+  e.stopPropagation();
+  isResizing = false;
+  currentlyResizing = {};
+  document.removeEventListener('mousemove', resizeColumnMoving);
+  document.removeEventListener('mouseup', resizeColumnEnd);
+  document.removeEventListener('mouseleave', resizeColumnEnd);
+};
 
-const resizeColumnMoving = (event) => {
-    event.stopPropagation();
+const onMouseDown = e => {
+  e.stopPropagation();
 
-    if(!isResizing) return;
+  const headerEle = e.target.parentElement;
+  const columnHeaderWidth = headerEle.getBoundingClientRect().width;
 
-    let pageX = event.pageX;
+  const tableEle = document.getElementsByClassName('rc-dt-table')[0];
+  const tableWidth = tableEle.getBoundingClientRect().width;
 
-    const widthDiff = pageX - currentlyResizing.startX;
-    
-    const headerGroupRow = document.getElementsByClassName('rc-dt-headergroup-row')[0];
+  const headerGroupId = headerEle.getAttribute('data-parentheaderid');
+  const groupHeaderEle = [
+    ...document.querySelectorAll('[data-headergroupid]')
+  ].find(
+    headerGroup =>
+      headerGroup.getAttribute('data-headergroupid') === headerGroupId
+  );
+  const groupHeaderWidth = groupHeaderEle.getBoundingClientRect().width;
 
-    const tableEleNewWidth = currentlyResizing.tableWidth + widthDiff;
-    const headerEleNewWidth = currentlyResizing.columnHeaderWidth + widthDiff;  
-    const headerGroupNewWidth =  currentlyResizing.groupHeaderWidth + widthDiff;  
-    
+  isResizing = true;
+  const startX = e.pageX;
 
-    currentlyResizing.headerEle.style.width = `${headerEleNewWidth}px`; 
-    currentlyResizing.groupHeaderEle.style.width = `${headerGroupNewWidth}px`;
-    currentlyResizing.tableEle.style.width = `${tableEleNewWidth}px`;
+  currentlyResizing = {
+    startX,
+    headerEle,
+    groupHeaderEle,
+    tableEle,
+    columnHeaderWidth,
+    groupHeaderWidth,
+    tableWidth
+  };
 
-    headerGroupRow.style.width = `${tableEleNewWidth}px`;
-}
+  document.addEventListener('mousemove', resizeColumnMoving);
+  document.addEventListener('mouseup', resizeColumnEnd);
+  document.addEventListener('mouseleave', resizeColumnEnd);
+};
 
-const resizeColumnEnd = (event) => {
-    event.stopPropagation();
-    isResizing = false;
-    currentlyResizing = {};
-    document.removeEventListener('mousemove', resizeColumnMoving);
-    document.removeEventListener('mouseup', resizeColumnEnd);
-    document.removeEventListener('mouseleave', resizeColumnEnd);
-}
-
-const ColumnResizer = ({value}) => {
-    return <div 
-                onMouseDown={e => onMouseDown(e, value)}
-                className="rc-column-resizer">
-                </div>
-}
+const ColumnResizer = () => {
+  return (
+    <div onMouseDown={e => onMouseDown(e)} className="rc-column-resizer" />
+  );
+};
 
 export default ColumnResizer;
