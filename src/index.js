@@ -8,8 +8,6 @@ import TableRows from './components/tableRows';
 import Utils from './utils';
 
 import './index.css';
-import { isArray } from 'util';
-
 class ReactDataTable extends React.Component {
   constructor(props) {
     super(props);
