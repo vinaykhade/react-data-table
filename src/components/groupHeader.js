@@ -2,7 +2,9 @@ import React from 'react';
 
 class TableGroupHeader extends React.Component {
   render() {
-    const { columns } = this.props;
+    const { columns, showHeaderGroups } = this.props;
+
+    if (!showHeaderGroups) return null;
     return (
       <div className="rc-dt-headergroup-row">
         {columns.map((headerCol, key) => (

@@ -8,10 +8,27 @@ import TableRows from './components/tableRows';
 import Utils from './utils';
 
 import './index.css';
+import { isArray } from 'util';
 
 class ReactDataTable extends React.Component {
+  constructor() {
+    super();
+    this.showHeaderGroups = false;
+  }
+
+  componentWillMount() {
+    this.showHeaderGroups = this.checkForHeaderGroups(this.props.columns);
+  }
+
   componentDidMount() {
-    Utils.arrangeColumnWidths();
+    this.showHeaderGroups = this.checkForHeaderGroups(this.props.columns);
+    Utils.arrangeColumnWidths(this.showHeaderGroups);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.columns !== nextProps.columns) {
+      this.showHeaderGroups = this.checkForHeaderGroups(nextProps.columns);
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -19,19 +36,42 @@ class ReactDataTable extends React.Component {
       prevProps.columns !== this.props.columns ||
       prevState.columns !== this.state.columns
     ) {
-      Utils.arrangeColumnWidths();
+      Utils.arrangeColumnWidths(this.showHeaderGroups);
     }
   }
 
+  checkForHeaderGroups = columns => {
+    let headerGroupsExist = false;
+    columns.forEach(col => {
+      if (col.columns && isArray(col.columns)) {
+        headerGroupsExist = true;
+        return;
+      }
+    });
+
+    return headerGroupsExist;
+  };
+
   render() {
     const { columns, data } = this.props;
+
     return (
       <div className="rc-dt-container">
-        <TableGroupHeader columns={columns} />
+        <TableGroupHeader
+          showHeaderGroups={this.showHeaderGroups}
+          columns={columns}
+        />
         <div className="rc-dt-table">
           <div className="rc-dt-body">
-            <TableHeader columns={columns} />
-            <TableRows data={data} columns={columns} />
+            <TableHeader
+              showHeaderGroups={this.showHeaderGroups}
+              columns={columns}
+            />
+            <TableRows
+              showHeaderGroups={this.showHeaderGroups}
+              data={data}
+              columns={columns}
+            />
           </div>
         </div>
       </div>
