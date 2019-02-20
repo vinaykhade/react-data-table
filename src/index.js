@@ -20,10 +20,6 @@ class ReactDataTable extends React.Component {
     this.showHeaderGroups = Utils.checkForHeaderGroups(props.columns);
   }
 
-  componentWillMount() {
-    // this.showHeaderGroups = Utils.checkForHeaderGroups(this.state.columns);
-  }
-
   componentDidMount() {
     this.showHeaderGroups = Utils.checkForHeaderGroups(this.state.columns);
     Utils.arrangeColumnWidths(this.showHeaderGroups);
