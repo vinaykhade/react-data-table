@@ -3,7 +3,7 @@ import React from 'react';
 let isResizing = false;
 let currentlyResizing = {};
 
-const resizeColumnMoving = e => {
+const resizeColumnMoving = (e, showHeaderGroups) => {
   e.stopPropagation();
 
   if (!isResizing) return;
@@ -12,19 +12,33 @@ const resizeColumnMoving = e => {
 
   const widthDiff = pageX - currentlyResizing.startX;
 
-  const headerGroupRow = document.getElementsByClassName(
-    'rc-dt-headergroup-row'
-  )[0];
+  let headerGroupRow = null;
+  if (showHeaderGroups) {
+    headerGroupRow = document.getElementsByClassName(
+      'rc-dt-headergroup-row'
+    )[0];
+  }
+  const headerRow = document.getElementsByClassName('rc-dt-header-row')[0];
 
   const tableEleNewWidth = currentlyResizing.tableWidth + widthDiff;
   const headerEleNewWidth = currentlyResizing.columnHeaderWidth + widthDiff;
-  const headerGroupNewWidth = currentlyResizing.groupHeaderWidth + widthDiff;
+  const headerGroupNewWidth = showHeaderGroups
+    ? currentlyResizing.groupHeaderWidth + widthDiff
+    : null;
 
-  currentlyResizing.headerEle.style.width = `${headerEleNewWidth}px`;
-  currentlyResizing.groupHeaderEle.style.width = `${headerGroupNewWidth}px`;
-  currentlyResizing.tableEle.style.width = `${tableEleNewWidth}px`;
+  currentlyResizing.headerEle.style.width = `${Math.round(
+    headerEleNewWidth
+  )}px`;
 
-  headerGroupRow.style.width = `${tableEleNewWidth}px`;
+  currentlyResizing.tableEle.style.width = `${Math.round(tableEleNewWidth)}px`;
+  headerRow.style.width = `${Math.round(tableEleNewWidth)}px`;
+
+  if (showHeaderGroups) {
+    currentlyResizing.groupHeaderEle.style.width = `${Math.round(
+      headerGroupNewWidth
+    )}px`;
+    headerGroupRow.style.width = `${Math.round(tableEleNewWidth + 1)}px`;
+  }
 };
 
 const resizeColumnEnd = e => {
@@ -36,7 +50,7 @@ const resizeColumnEnd = e => {
   document.removeEventListener('mouseleave', resizeColumnEnd);
 };
 
-const onMouseDown = e => {
+const onMouseDown = (e, showHeaderGroups) => {
   e.stopPropagation();
 
   const headerEle = e.target.parentElement;
@@ -46,13 +60,18 @@ const onMouseDown = e => {
   const tableWidth = tableEle.getBoundingClientRect().width;
 
   const headerGroupId = headerEle.getAttribute('data-parentheaderid');
-  const groupHeaderEle = [
-    ...document.querySelectorAll('[data-headergroupid]')
-  ].find(
-    headerGroup =>
-      headerGroup.getAttribute('data-headergroupid') === headerGroupId
-  );
-  const groupHeaderWidth = groupHeaderEle.getBoundingClientRect().width;
+
+  let groupHeaderEle,
+    groupHeaderWidth = null;
+  if (showHeaderGroups) {
+    groupHeaderEle = [
+      ...document.querySelectorAll('[data-headergroupid]')
+    ].find(
+      headerGroup =>
+        headerGroup.getAttribute('data-headergroupid') === headerGroupId
+    );
+    groupHeaderWidth = groupHeaderEle.getBoundingClientRect().width;
+  }
 
   isResizing = true;
   const startX = e.pageX;
@@ -67,14 +86,19 @@ const onMouseDown = e => {
     tableWidth
   };
 
-  document.addEventListener('mousemove', resizeColumnMoving);
+  document.addEventListener('mousemove', e =>
+    resizeColumnMoving(e, showHeaderGroups)
+  );
   document.addEventListener('mouseup', resizeColumnEnd);
   document.addEventListener('mouseleave', resizeColumnEnd);
 };
 
-const ColumnResizer = () => {
+const ColumnResizer = ({ showHeaderGroups }) => {
   return (
-    <div onMouseDown={e => onMouseDown(e)} className="rc-column-resizer" />
+    <div
+      onMouseDown={e => onMouseDown(e, showHeaderGroups)}
+      className="rc-column-resizer"
+    />
   );
 };
 

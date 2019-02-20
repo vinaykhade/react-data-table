@@ -4,7 +4,9 @@ const utils = (() => {
 
   const setTableRowsWidth = (tableElements, width) => {
     [...tableElements].forEach(tableEle => {
-      tableEle.style.width = `${Math.round(width)}px`;
+      if (tableEle !== null) {
+        tableEle.style.width = `${Math.round(width)}px`;
+      }
     });
   };
 
@@ -92,10 +94,14 @@ const utils = (() => {
     }
   };
 
-  const arrangeColumnWidths = () => {
-    const tableGroupHeaderRow = document.getElementsByClassName(
-      'rc-dt-headergroup-row'
-    )[0];
+  const arrangeColumnWidths = showHeaderGroups => {
+    let tableGroupHeaderRow = null;
+    if (showHeaderGroups) {
+      tableGroupHeaderRow = document.getElementsByClassName(
+        'rc-dt-headergroup-row'
+      )[0];
+    }
+
     const tableHeaderRow = document.getElementsByClassName('rc-header-column');
     const headerRow = document.getElementsByClassName('rc-dt-header-row')[0];
     const tableEle = document.getElementsByClassName('rc-dt-table')[0];
@@ -115,6 +121,10 @@ const utils = (() => {
             .getBoundingClientRect().width + 30;
         sumOfMinWidthOfColumns += Math.round(colMinWidth);
       }
+
+      if (!showHeaderGroups) {
+        col.style.top = 0;
+      }
     });
 
     if (tableHeaderRow.length > 0) {
@@ -130,14 +140,16 @@ const utils = (() => {
         );
       });
 
-      const groupHeaderColList = document.getElementsByClassName(
-        'rc-dt-header-column'
-      );
-      [...groupHeaderColList].forEach(headerGroup => {
-        const headerGroupId = headerGroup.getAttribute('data-headergroupid');
-        const headerGroupWidth = headerGroupWidthMap[headerGroupId];
-        setTableRowsWidth([headerGroup], headerGroupWidth);
-      });
+      if (showHeaderGroups) {
+        const groupHeaderColList = document.getElementsByClassName(
+          'rc-dt-header-column'
+        );
+        [...groupHeaderColList].forEach(headerGroup => {
+          const headerGroupId = headerGroup.getAttribute('data-headergroupid');
+          const headerGroupWidth = headerGroupWidthMap[headerGroupId];
+          setTableRowsWidth([headerGroup], headerGroupWidth);
+        });
+      }
 
       /* Reset values to initial after looping */
       sumOfColumnWidths = 0;
