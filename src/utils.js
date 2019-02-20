@@ -157,8 +157,34 @@ const utils = (() => {
     }
   };
 
+  const assignDefaultHeaderNames = (columns, headerGroupsExist) => {
+    /*TODO: Handle assigning when headergroups do not exist and nesting*/
+    return columns.map(col => {
+      if (col.Header.length === 0) {
+        col.customHeaderName = Math.random()
+          .toString(36)
+          .substring(7);
+      }
+      return col;
+    });
+  };
+
+  const checkForHeaderGroups = columns => {
+    let headerGroupsExist = false;
+    columns.forEach(col => {
+      if (col.columns) {
+        headerGroupsExist = true;
+        return;
+      }
+    });
+
+    return headerGroupsExist;
+  };
+
   return {
-    arrangeColumnWidths
+    arrangeColumnWidths,
+    assignDefaultHeaderNames,
+    checkForHeaderGroups
   };
 })();
 

@@ -11,7 +11,11 @@ class TableHeader extends React.Component {
             <div
               key={key}
               data-customwidth={column.width ? column.width : null}
-              data-parentheaderid={`${headerCol.Header}-${headerKey}`}
+              data-parentheaderid={`${
+                headerCol.Header.length > 0
+                  ? headerCol.Header
+                  : headerCol.customHeaderName
+              }-${headerKey}`}
               className="rc-dt-column rc-column rc-header-column"
             >
               <div className="rc-column-content">
