@@ -37,7 +37,17 @@ const resizeColumnMoving = (e, showHeaderGroups) => {
     currentlyResizing.groupHeaderEle.style.width = `${Math.round(
       headerGroupNewWidth
     )}px`;
-    headerGroupRow.style.width = `${Math.round(tableEleNewWidth + 1)}px`;
+
+    let headerGroupRowWidth = 0;
+    const groupHeaderColList = document.getElementsByClassName(
+      'rc-dt-header-column'
+    );
+    [...groupHeaderColList].forEach(headerGroup => {
+      headerGroupRowWidth += Math.round(
+        headerGroup.getBoundingClientRect().width
+      );
+    });
+    headerGroupRow.style.width = `${Math.round(headerGroupRowWidth)}px`;
   }
 };
 
