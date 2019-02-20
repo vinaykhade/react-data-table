@@ -11,49 +11,50 @@ import './index.css';
 import { isArray } from 'util';
 
 class ReactDataTable extends React.Component {
-  constructor() {
-    super();
-    this.showHeaderGroups = false;
+  constructor(props) {
+    super(props);
+    this.state = {
+      columns: Utils.assignDefaultHeaderNames(
+        props.columns,
+        Utils.checkForHeaderGroups(props.columns)
+      )
+    };
+    this.showHeaderGroups = Utils.checkForHeaderGroups(props.columns);
   }
 
   componentWillMount() {
-    this.showHeaderGroups = this.checkForHeaderGroups(this.props.columns);
+    // this.showHeaderGroups = Utils.checkForHeaderGroups(this.state.columns);
   }
 
   componentDidMount() {
-    this.showHeaderGroups = this.checkForHeaderGroups(this.props.columns);
+    this.showHeaderGroups = Utils.checkForHeaderGroups(this.state.columns);
     Utils.arrangeColumnWidths(this.showHeaderGroups);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.columns !== nextProps.columns) {
-      this.showHeaderGroups = this.checkForHeaderGroups(nextProps.columns);
+    if (this.state.columns !== nextProps.columns) {
+      this.showHeaderGroups = Utils.checkForHeaderGroups(nextProps.columns);
+      this.setState({
+        columns: Utils.assignDefaultHeaderNames(
+          nextProps.columns,
+          this.showHeaderGroups
+        )
+      });
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (
-      prevProps.columns !== this.props.columns ||
+      prevProps.columns !== this.state.columns ||
       prevState.columns !== this.state.columns
     ) {
       Utils.arrangeColumnWidths(this.showHeaderGroups);
     }
   }
 
-  checkForHeaderGroups = columns => {
-    let headerGroupsExist = false;
-    columns.forEach(col => {
-      if (col.columns && isArray(col.columns)) {
-        headerGroupsExist = true;
-        return;
-      }
-    });
-
-    return headerGroupsExist;
-  };
-
   render() {
-    const { columns, data } = this.props;
+    const { data } = this.props;
+    const { columns } = this.state;
 
     return (
       <div className="rc-dt-container">

@@ -10,7 +10,11 @@ class TableGroupHeader extends React.Component {
         {columns.map((headerCol, key) => (
           <div
             key={key}
-            data-headergroupid={`${headerCol.Header}-${key}`}
+            data-headergroupid={`${
+              headerCol.Header.length > 0
+                ? headerCol.Header
+                : headerCol.customHeaderName
+            }-${key}`}
             className="rc-dt-header-column"
           >
             {headerCol.Header}
